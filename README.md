@@ -2,4 +2,4 @@
 
 Meine Implementierung des Einzelbeispieles der LV Software Engineering II an der AAU Klagenfurt im Sommersemester 2021.
 
-![Build](https://github.com/luko0610/SoftwareEngineeringII-AAU-Einzelbeispiel/.github/workflows/gradle.yml)
+![Build](https://github.com/luko0610/SoftwareEngineeringII-AAU-Einzelbeispiel/actions/workflows/gradle.yml/badge.svg)
