@@ -3,13 +3,9 @@ package com.luko.networktest;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Sends the given Matrikelnummer to the server and returns the result.
+     * Sends the given Matrikelnummer to the server, as a tcp request and returns the result.
      * @param number
      */
     private String SendMatrikelNummer(int number) throws IOException {
@@ -66,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         DataOutputStream outStream = new DataOutputStream(clientSocket.getOutputStream());
         BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-        outStream.writeBytes(Integer.toString(number) + "\n");
+        outStream.writeBytes(number + "\n");
 
         String result = reader.readLine();
 
@@ -75,8 +71,13 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
+    /***
+     * Calculates the alternating checksum of the given number.
+     * @param number The number to calculate the alternating checksum from.
+     * @return The alternating checksum of the given number.
+     */
     private int AlternatingChecksum(int number) {
-        boolean isMinus = true;
+        boolean isMinus = false;
         String numberString = Integer.toString(number);
         int result = 0;
 
@@ -103,26 +104,31 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
+            try {
 
-                    int number = Integer.parseInt(tvId.getText().toString());
-                    final String result = SendMatrikelNummer(number);
-                    setResponseText(result);
-                } catch (NumberFormatException ex) {
-                    showToast("Matrikelnummer darf nur Ziffern enthalten.");
-                    setResponseText("");
-                } catch (IOException e) {
-                    showToast("Netzwerkfehler.");
-                    setResponseText("");
-                }
-                catch(Exception ex) {
-                    showToast("Fehler");
-                    setResponseText("");
-                }
+                int number = Integer.parseInt(tvId.getText().toString());
+                final String result = SendMatrikelNummer(number);
+
+                setResponseText(result);
+            } catch (NumberFormatException ex) {
+                showToast("Matrikelnummer darf nur Ziffern enthalten.");
+                setResponseText("");
+            } catch (IOException e) {
+                showToast("Netzwerkfehler.");
+                setResponseText("");
+            }
+            catch(Exception ex) {
+                showToast("Unbekannter Fehler.");
+                setResponseText("");
+            }
             }
         }).start();
     }
 
+    /**
+     * Shows the given error message using a toast.
+     * @param toast
+     */
     private void showToast(final String toast)
     {
         runOnUiThread(new Runnable() {
@@ -133,17 +139,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Sets tvResponse text to the given text.
+     * @param result
+     */
     private void setResponseText(final String result)
     {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                TextView tvResponse = findViewById(R.id.tvResponse);
                 tvResponse.setText(result);
             }
         });
     }
 
+    /**
+     * Btn event handler for the alternating checksum button.
+     * @param view
+     */
     public void handleAlternatingChecksum(View view) {
         int number = Integer.parseInt(tvId.getText().toString());
         int result = AlternatingChecksum(number);
